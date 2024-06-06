@@ -1,5 +1,6 @@
 mean_hmF2 = NaN*ones(12,24);
 dmean_hmF2 = NaN*ones(12,24);
+mean_hmF2_count = NaN*ones(12,24);
 
 for j=1:12
   for k=1:24
@@ -14,7 +15,7 @@ for j=1:12
         % estimate average height of subset
         mean_hmF2(j,k) = nanmean(z_in);
         dmean_hmF2(j,k) = nanstd(z_in)./sqrt((sum(~isnan(z_in))));
-
+        mean_hmF2_count(j,k) = sum(~isnan(z_in));
     end
   end
 end

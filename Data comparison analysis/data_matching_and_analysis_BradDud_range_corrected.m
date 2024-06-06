@@ -101,8 +101,9 @@ reshaped_hour_index(bad) = [];
 
 reshaped_sza(bad) = [];
 
-sza_ge90_le100 = find(reshaped_sza >= 90*pi/180 & reshaped_sza <= 100*pi/180);
-sza_gt_100 = find(reshaped_sza > 100*pi/180);
+% sza_lt_90 = find(reshaped_sza < 90*pi/180); % added in response to ref #2's request for revision of figure 2
+% sza_ge90_le100 = find(reshaped_sza >= 90*pi/180 & reshaped_sza <= 100*pi/180);
+% sza_gt_100 = find(reshaped_sza > 100*pi/180);
 
 % Robust fit, accounting for outliers
     if length(reshaped_ISR_all)>2
@@ -119,9 +120,42 @@ sza_gt_100 = find(reshaped_sza > 100*pi/180);
         da_all = NaN;
     end
 
+% % Create figure 2 in the paper
+% % Print Bradley-Dudeney hmF2 values vs ISR values for all times, along with
+% % robust fit (to minimise influence of outliers)
+% figure(100)
+% errorbar(reshaped_ISR_all, reshaped_BradDud_all, dreshaped_ISR_all, dreshaped_ISR_all, dreshaped_BradDud_all, dreshaped_BradDud_all,'k.','capsize',0,'color',[0.5 0.5 0.5])
+% hold on
+% plot(reshaped_ISR_all, reshaped_BradDud_all,'k.','markersize',6)
+% % Now separate foE = 0.4 MHz points
+% % plot(reshaped_ISR_all(foE_set_to_04),reshaped_BradDud_all(foE_set_to_04),'r.') 
+% 
+% % Now plot night and dawn/dusk values separately
+% plot(reshaped_ISR_all(sza_gt_100),reshaped_BradDud_all(sza_gt_100),'c.')
+% plot(reshaped_ISR_all(sza_ge90_le100),reshaped_BradDud_all(sza_ge90_le100),'m.')
+% 
+% 
+% axis([50 500 50 500])
+% axis('square')
+% plot([50 500], b_all*[50 500]+a_all,'r')
+% text(60,480,['All y=(' num2str(b_all,'%2.2f') ' \pm ' num2str(db_all,'%2.2f') ')x + (' num2str(a_all,'%2.2f') ' \pm ' num2str(da_all,'%2.2f') ')']);
+% xlabel('ISR hmF2','fontsize',14)
+% ylabel('Ionosonde hmF2','fontsize',14)
+% hold off
+
+%%
+sza_lt_90 = find(reshaped_sza < 90*pi/180); % added in response to ref #2's request for revision of figure 2
+sza_ge90_le100 = find(reshaped_sza >= 90*pi/180 & reshaped_sza <= 100*pi/180);
+sza_gt_100 = find(reshaped_sza > 100*pi/180);
+
+% Create revised figure 2 after referee #2 comments
 % Print Bradley-Dudeney hmF2 values vs ISR values for all times, along with
 % robust fit (to minimise influence of outliers)
 figure(100)
+% subplot(221)
+tiledlayout(2,2)
+nexttile
+%sp211 = subplot('position',[0.15 0.55 0.4 0.4]);
 errorbar(reshaped_ISR_all, reshaped_BradDud_all, dreshaped_ISR_all, dreshaped_ISR_all, dreshaped_BradDud_all, dreshaped_BradDud_all,'k.','capsize',0,'color',[0.5 0.5 0.5])
 hold on
 plot(reshaped_ISR_all, reshaped_BradDud_all,'k.','markersize',6)
@@ -130,28 +164,36 @@ plot(reshaped_ISR_all, reshaped_BradDud_all,'k.','markersize',6)
 
 % Now plot night and dawn/dusk values separately
 plot(reshaped_ISR_all(sza_gt_100),reshaped_BradDud_all(sza_gt_100),'c.')
-plot(reshaped_ISR_all(sza_ge90_le100),reshaped_BradDud_all(sza_ge90_le100),'y.')
-
+plot(reshaped_ISR_all(sza_ge90_le100),reshaped_BradDud_all(sza_ge90_le100),'m.')
 
 axis([50 500 50 500])
 axis('square')
-plot([50 500], b_all*[50 500]+a_all,'r')
-text(60,480,['All y=(' num2str(b_all,'%2.2f') ' \pm ' num2str(db_all,'%2.2f') ')x + (' num2str(a_all,'%2.2f') ' \pm ' num2str(da_all,'%2.2f') ')']);
-xlabel('ISR hmF2','fontsize',14)
+plot([50 500], b_all*[50 500]+a_all,'k.-')
+text(60,480,['y=(' num2str(b_all,'%2.2f') '\pm' num2str(db_all,'%2.2f') ')x+(' num2str(a_all,'%2.2f') '\pm' num2str(da_all,'%2.2f') ')'],'fontsize',6);
+title('All','fontsize',14)
+% xlabel('ISR hmF2','fontsize',14)
 ylabel('Ionosonde hmF2','fontsize',14)
 hold off
 
-
-% Now repeat fit without the nighttime values where foE is set to 0.4
-
-% daytime_data = find(reshaped_foE_all ~= 0.4 & isnan(reshaped_foE_all)==0);
-daytime_data = find(reshaped_sza < 90*pi/180);
+% subplot(222)
+%sp222 = subplot('position',[0.55 0.55 0.4 0.4]);
+nexttile
+% Daytime values only
+errorbar(reshaped_ISR_all(sza_lt_90), reshaped_BradDud_all(sza_lt_90), dreshaped_ISR_all(sza_lt_90), dreshaped_ISR_all(sza_lt_90), dreshaped_BradDud_all(sza_lt_90), dreshaped_BradDud_all(sza_lt_90),'k.','capsize',0,'color',[0.5 0.5 0.5])
+hold on
+plot(reshaped_ISR_all(sza_lt_90), reshaped_BradDud_all(sza_lt_90),'k.','markersize',6)
+axis([50 500 50 500])
+axis('square')
+title('Daytime','fontsize',14)
+% xlabel('ISR hmF2','fontsize',14)
+% ylabel('Ionosonde hmF2','fontsize',14)
+hold off
 
 % Robust fit, accounting for outliers
 
 
-    if length(reshaped_ISR_all)>2
-        mdlr_all_day = fitlm(reshaped_ISR_all(daytime_data),reshaped_BradDud_all(daytime_data), 'RobustOpts','on');
+    if length(sza_lt_90)>2
+        mdlr_all_day = fitlm(reshaped_ISR_all(sza_lt_90),reshaped_BradDud_all(sza_lt_90), 'RobustOpts','on');
         fitvalues_iono_corr_vs_ISR_day = table2array(mdlr_all_day.Coefficients);
         b_all_day = fitvalues_iono_corr_vs_ISR_day(2,1);
         db_all_day = fitvalues_iono_corr_vs_ISR_day(2,2);
@@ -163,15 +205,115 @@ daytime_data = find(reshaped_sza < 90*pi/180);
         a_all_day = NaN;
         da_all_day = NaN;
     end
+% subplot(sp222)
     hold on
     plot([50 500], b_all_day*[50 500]+a_all_day,'k.-')
-    text(60,450,['Day y=(' num2str(b_all_day,'%2.2f') ' \pm ' num2str(db_all_day,'%2.2f') ')x + (' num2str(a_all_day,'%2.2f') ' \pm ' num2str(da_all_day,'%2.2f') ')']);
-    xlabel('ISR hmF2','fontsize',14)
-    ylabel('Ionosonde hmF2','fontsize',14)
+    text(60,480,['y=(' num2str(b_all_day,'%2.2f') '\pm' num2str(db_all_day,'%2.2f') ')x+(' num2str(a_all_day,'%2.2f') '\pm' num2str(da_all_day,'%2.2f') ')'],'fontsize',6);
+    % xlabel('ISR hmF2','fontsize',14)
+    % ylabel('Ionosonde hmF2','fontsize',14)
     hold off
 
-print -djpeg figure02.jpg
+% Now separate foE = 0.4 MHz points
+% plot(reshaped_ISR_all(foE_set_to_04),reshaped_BradDud_all(foE_set_to_04),'r.') 
 
+% Now plot night and dawn/dusk values separately
+% subplot(223)
+nexttile
+% sp223 = subplot('position',[0.15 0.05 0.4 0.4]);
+errorbar(reshaped_ISR_all(sza_gt_100), reshaped_BradDud_all(sza_gt_100), dreshaped_ISR_all(sza_gt_100), dreshaped_ISR_all(sza_gt_100), dreshaped_BradDud_all(sza_gt_100), dreshaped_BradDud_all(sza_gt_100),'k.','capsize',0,'color',[0.5 0.5 0.5]);
+hold on
+plot(reshaped_ISR_all(sza_gt_100), reshaped_BradDud_all(sza_gt_100),'c.','markersize',6)
+axis([50 500 50 500])
+axis('square')
+title('Night-time','fontsize',14)
+xlabel('ISR hmF2','fontsize',14)
+ylabel('Ionosonde hmF2','fontsize',14)
+hold off
+% Robust fit, accounting for outliers
+
+
+    if length(sza_gt_100)>2
+        mdlr_night = fitlm(reshaped_ISR_all(sza_gt_100),reshaped_BradDud_all(sza_gt_100), 'RobustOpts','on');
+        fitvalues_iono_corr_vs_ISR_night = table2array(mdlr_night.Coefficients);
+        b_night = fitvalues_iono_corr_vs_ISR_night(2,1);
+        db_night = fitvalues_iono_corr_vs_ISR_night(2,2);
+        a_night = fitvalues_iono_corr_vs_ISR_night(1,1);
+        da_night = fitvalues_iono_corr_vs_ISR_night(1,2);
+    else
+        b_night = NaN;
+        db_night = NaN;
+        a_night = NaN;
+        da_night = NaN;
+    end
+% subplot(sp222)
+    hold on
+    plot([50 500], b_night*[50 500]+a_night,'k.-')
+    text(60,480,['y=(' num2str(b_night,'%2.2f') '\pm' num2str(db_night,'%2.2f') ')x+(' num2str(a_night,'%2.2f') '\pm' num2str(da_night,'%2.2f') ')'],'fontsize',6);
+    % xlabel('ISR hmF2','fontsize',14)
+    % ylabel('Ionosonde hmF2','fontsize',14)
+    hold off
+
+% subplot(224)
+% sp224 = subplot('position',[0.55 0.05 0.4 0.4]);
+nexttile
+errorbar(reshaped_ISR_all(sza_ge90_le100), reshaped_BradDud_all(sza_ge90_le100), dreshaped_ISR_all(sza_ge90_le100), dreshaped_ISR_all(sza_ge90_le100), dreshaped_BradDud_all(sza_ge90_le100), dreshaped_BradDud_all(sza_ge90_le100),'k.','capsize',0,'color',[0.5 0.5 0.5]);
+hold on
+plot(reshaped_ISR_all(sza_ge90_le100), reshaped_BradDud_all(sza_ge90_le100),'m.','markersize',6)
+axis([50 500 50 500])
+axis('square')
+title('Twilight','fontsize',14)
+xlabel('ISR hmF2','fontsize',14)
+hold off
+% Robust fit, accounting for outliers
+
+
+    if length(sza_ge90_le100)>2
+        mdlr_twilight = fitlm(reshaped_ISR_all(sza_ge90_le100),reshaped_BradDud_all(sza_ge90_le100), 'RobustOpts','on');
+        fitvalues_iono_corr_vs_ISR_twilight = table2array(mdlr_twilight.Coefficients);
+        b_twilight = fitvalues_iono_corr_vs_ISR_twilight(2,1);
+        db_twilight = fitvalues_iono_corr_vs_ISR_twilight(2,2);
+        a_twilight = fitvalues_iono_corr_vs_ISR_twilight(1,1);
+        da_twilight = fitvalues_iono_corr_vs_ISR_twilight(1,2);
+    else
+        b_twilight = NaN;
+        db_twilight = NaN;
+        a_twilight = NaN;
+        da_twilight = NaN;
+    end
+% subplot(sp222)
+    hold on
+    plot([50 500], b_twilight*[50 500]+a_twilight,'k.-')
+    text(60,480,['y=(' num2str(b_twilight,'%2.2f') '\pm' num2str(db_twilight,'%2.2f') ')x+(' num2str(a_twilight,'%2.2f') '\pm' num2str(da_twilight,'%2.2f') ')'],'fontsize',6);
+    % xlabel('ISR hmF2','fontsize',14)
+    % ylabel('Ionosonde hmF2','fontsize',14)
+    hold off
+
+
+
+% ylabel('Ionosonde hmF2','fontsize',14)
+
+% plot(reshaped_ISR_all(sza_gt_100),reshaped_BradDud_all(sza_gt_100),'c.')
+% plot(reshaped_ISR_all(sza_ge90_le100),reshaped_BradDud_all(sza_ge90_le100),'m.')
+
+% axis([50 500 50 500])
+% axis('square')
+% plot([50 500], b_all*[50 500]+a_all,'r')
+% text(60,480,['All y=(' num2str(b_all,'%2.2f') ' \pm ' num2str(db_all,'%2.2f') ')x + (' num2str(a_all,'%2.2f') ' \pm ' num2str(da_all,'%2.2f') ')']);
+% xlabel('ISR hmF2','fontsize',14)
+% ylabel('Ionosonde hmF2','fontsize',14)
+% hold off
+
+
+% Now repeat fit without the nighttime values where foE is set to 0.4
+
+% daytime_data = find(reshaped_foE_all ~= 0.4 & isnan(reshaped_foE_all)==0);
+% daytime_data = find(reshaped_sza < 90*pi/180);
+
+
+
+print -djpeg figure02_revised.jpg
+
+%%
 
 %% Plot annual ionosonde against ISR
 % Plot not used in paper but it is interesting to see how the annual
@@ -252,15 +394,27 @@ for i=1:length(am_u_year)
     dmean_annual_am(i) = nanstd(am(am_subset))./sqrt(length(am_subset));
 end
 
-% Create annual F2/F1 ratio
+% remove nighttime foE values before calculating annual median.
+badfoE = find(median_foE == 0.4);
+median_foE(badfoE) = NaN;
+
+% Create annual F2/F1 ratio and F2/E ratio
 F2F1_ratio = median_foF2./median_foF1;
+F2E_ratio = median_foF2./median_foE;
 for i=1:length(u_year)
     F2F1_subset = find(year_index_iono == u_year(i) & isnan(median_foF2)==0 & isnan(median_foF1) == 0);
     mean_annual_F2F1_ratio(i) = nanmean(F2F1_ratio(F2F1_subset));
     dmean_annual_F2F1_ratio(i) = nanstd(F2F1_ratio(F2F1_subset))./sqrt(length(F2F1_subset));
+
+    F2E_subset = find(year_index_iono == u_year(i) & isnan(median_foF2)==0 & isnan(median_foE) == 0);
+    % mean_annual_F2E_ratio(i) = nanmean(F2E_ratio(F2E_subset));
+    mean_annual_F2E_ratio(i) =   mean(F2E_ratio(F2E_subset),'omitnan');
+    dmean_annual_F2E_ratio(i) = nanstd(F2E_ratio(F2E_subset))./sqrt(length(F2E_subset));
 end
 
 % am data start in 1959 so 1986 is am_u_year(28) and 2020 is am_u_year(end-2)
+
+%%
 
 % Plot four parameters for visual comparison (figure 8 in paper)
 figure(109)
@@ -271,7 +425,7 @@ subplot(221)
     xlabel('Year')
     ylabel('\delta hmF2 (%)')
     title('Model error for 250 km')
-    text(1981,10,'a)')
+    text(1981,16,'a)')
 subplot(222)
     plot(years, nanmean(composition_proxy,2),'k')
     xlabel('Year')
@@ -285,13 +439,24 @@ subplot(223)
     title('annual mean am index')
     text(1981,36,'c)')
 subplot(224)
+    yyaxis left
+    set(gca,'ycolor',[0 0 0]);
     errorbar(years, mean_annual_F2F1_ratio(30:end), dmean_annual_F2F1_ratio(30:end),'k','capsize',0) 
+    ylabel('F2F1 Ratio','color',[0 0 0])
+    hold on
+    text(1981,1.77,'d)')
+    % hold off
+    yyaxis right
+    set(gca,'ycolor',[0 0 0]);
+    % hold on
+    errorbar(years, mean_annual_F2E_ratio(30:end), dmean_annual_F2E_ratio(30:end),'k:','capsize',0)
     xlabel('Year')
-    ylabel('foF2/foF1')
-    title('annual mean foF2/foF1')
-    text(1981,1.75,'d)')
+    ylabel('F2E Ratio','color',[0 0 0])
+    title('annual mean F2/E & F2/F1 ratios')
     hold off
-print -djpeg fit_err_vs_time_cf_proxies.jpg
+print -djpeg fit_err_vs_time_cf_proxies_updated.jpg
+
+%%
 
 % Plot model error and plots of fits between model error and other three parameters
 % This plot is not used in the paper but the correlations are quoted
@@ -354,8 +519,9 @@ subplot(224)
     title('\delta hmF2 vs annual mean foF2/foF1')
 
     [corcoeff_F2F1, pval_F2F1] = corrcoef(mean_annual_F2F1_ratio(30:end), ydata)
+    [corcoeff_F2E, pval_F2E] = corrcoef(mean_annual_F2E_ratio(30:end), ydata)
     
-     % fit line to data
+     % fit line to F2F1 data
      mdlr_F2F1 = fitlm(mean_annual_F2F1_ratio(30:end), ydata, 'RobustOpts','on');
      fitvalues_iono_corr_vs_ISR = table2array(mdlr_F2F1.Coefficients);
      b_F2F1 = fitvalues_iono_corr_vs_ISR(2,1);

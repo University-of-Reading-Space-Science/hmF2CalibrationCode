@@ -30,15 +30,19 @@ hmF2_BradDud = a.*(M3000F2).^b;
 if exist('dfoF2')==1
   dx = x.*sqrt( (dfoF2./foF2).^2 + (dfoE./foE).^2 );
   dx(bad) = NaN;
-  dbdx = -2.5*2.35*(2.5*x-3).^-3.35;
-  db = sqrt( (dx.^2).*(dbdx.^2) );
-  dadx = 355*(x-1.4);
-  da = sqrt( (dx.^2).*(dadx).^2 );
-  dDda = M3000F2.^b;                      % differential of formula wrt a
-  dDdb = a.*(M3000F2.^b).*log10(M3000F2);   % differential of formula wrt b
-  dDdM = a.*b.*(M3000F2).^(b-1);          % differential of formula wrt M3000F2
 
-  dhmF2_BradDud = sqrt( (da.*da).*(dDda).^2 + (db.*db).*(dDdb).^2 + (dM3000F2.^2).*dDdM.^2);
+  dhmF2_BradDud = sqrt(((-(-355 ./ ( x - 1.4) ^ 2 .*  M3000F2 ^ ((2.5.*x - 3).^(-2.35) - 1.6)) - 5.875.*(2.5.*x - 3).^(-2.35 - 1).*(1890 - 355./( x - 1.4)).*M3000F2.^((2.5.*x - 3).^(-2.35) - 1.6).*log(M3000F2)).*dx).^2 + (M3000F2.^((2.5.*x - 3).^(-2.35) - 1.6 + -1).*(1890 - 355./( x - 1.4)).*((2.5.*x - 3).^(-2.35) - 1.6).*dM3000F2).^2);
+
+  % dbdx = -2.5*2.35*(2.5*x-3).^-3.35;
+  % db = sqrt( (dx.^2).*(dbdx.^2) );
+  % db = b.*sqrt( ((-3.25*2.5.*dx)/(2.5.*x-3)).^2);
+  % dadx = 355*(x-1.4);
+  % da = sqrt( (dx.^2).*(dadx).^2 );
+  % dDda = M3000F2.^b;                      % differential of formula wrt a
+  % dDdb = a.*(M3000F2.^b).*log10(M3000F2);   % differential of formula wrt b
+  % dDdM = a.*b.*(M3000F2).^(b-1);          % differential of formula wrt M3000F2
+  % 
+  % dhmF2_BradDud = sqrt( (da.*da).*(dDda).^2 + (db.*db).*(dDdb).^2 + (dM3000F2.^2).*dDdM.^2);
 end
 
 end
